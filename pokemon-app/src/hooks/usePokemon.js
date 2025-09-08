@@ -19,22 +19,27 @@ export function usePokemon(query) {
       setError(null)
       setData(null)
       try {
-        const res = await fetch(
-          `https://pokeapi.co/api/v2/pokemon/${encodeURIComponent(query)}`,
-          { signal: controller.signal }
-        )
+        const url = `https://pokeapi.co/api/v2/pokemon/${encodeURIComponent(query)}`
+        console.log('[usePokemon] fetching:', url)
+
+        const res = await fetch(url, { signal: controller.signal })
 
         if (!res.ok) {
+          const text = await res.text().catch(() => '')
+          console.error('[usePokemon] http error', res.status, text)
           if (res.status === 404) throw new Error('NOT_FOUND')
-          throw new Error('HTTP_ERROR')
+          throw new Error(`HTTP_${res.status}`)
         }
 
         const json = await res.json()
+        console.log('[usePokemon] success:', json?.name, '#'+json?.id)
         setData(json)
       } catch (err) {
         if (err.name === 'AbortError') return
+        console.error('[usePokemon] fail:', err)
         if (err.message === 'NOT_FOUND') setError('Pokémon hittades inte.')
-        else setError('Något gick fel. Försök igen senare.')
+        else if (err.message?.startsWith('HTTP_')) setError('Serverfel från API:t.')
+        else setError('Nätverksfel. Kontrollera din uppkoppling och försök igen.')
       } finally {
         setLoading(false)
       }

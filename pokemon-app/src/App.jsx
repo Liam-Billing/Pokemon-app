@@ -7,23 +7,49 @@ import { usePokemon } from './hooks/usePokemon.js'
 
 export default function App() {
   const [query, setQuery] = useState('')
+  const [lastQuery, setLastQuery] = useState('')
   const { data, loading, error } = usePokemon(query)
+
+  function handleSearch(q) {
+    setLastQuery(q)
+    setQuery(q)
+  }
 
   return (
     <div className="container">
       <header>
         <h1>Pokémon-sök</h1>
-        <p className="helper">Skriv ett namn (t.ex. <em>pikachu</em>) eller ett id (t.ex. <em>25</em>).</p>
       </header>
 
       <div className="card">
-        <SearchForm onSearch={setQuery} />
+        <SearchForm onSearch={handleSearch} />
+        {/* Statusrad: alltid synlig efter första sökningen */}
+        {lastQuery && !loading && (
+          <p className="helper" style={{ marginTop: 8 }}>
+            Senast sökt: <strong>{lastQuery}</strong>
+          </p>
+        )}
       </div>
 
       {loading && <div className="card"><Loader /></div>}
-      {error && <div className="card"><ErrorMessage message={error} /></div>}
+
+      {/* Visa fel tydligt med senaste sökningen */}
+      {error && (
+        <div className="card">
+          <ErrorMessage message={`${error} (sökning: "${lastQuery}")`} />
+        </div>
+      )}
+
+      {/* Visa träff */}
       {data && !loading && !error && (
         <div className="card"><PokemonCard pokemon={data} /></div>
+      )}
+
+      {/* Om vi har sökt men varken error eller data (ska inte hända, men säkerhetsnät) */}
+      {!loading && !error && !data && lastQuery && (
+        <div className="card">
+          <p className="helper">Ingen data att visa för "{lastQuery}".</p>
+        </div>
       )}
     </div>
   )

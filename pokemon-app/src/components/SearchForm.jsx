@@ -15,8 +15,14 @@ export default function SearchForm({ onSearch }) {
     const safe = sanitizeQuery(value)
     const isValid = safe.length > 0 && /^[a-z0-9-]+$/.test(safe)
     setInvalid(!isValid)
+    console.log('[SearchForm] submitting:', JSON.stringify(value), '->', JSON.stringify(safe), 'valid=', isValid)
     if (!isValid) return
     onSearch(safe)
+  }
+
+  function handleDemo() {
+    setValue('pikachu')
+    onSearch('pikachu')
   }
 
   return (
@@ -36,15 +42,16 @@ export default function SearchForm({ onSearch }) {
         autoComplete="off"
       />
       <small id="search-help" className="helper">
-        Endast bokstäver, siffror och bindestreck.
+        Endast bokstäver, siffror och bindestreck tillåts.
       </small>
       {invalid && (
         <div className="error" role="alert">
           Ogiltig inmatning. Försök igen.
         </div>
       )}
-      <div>
+      <div style={{ display: 'flex', gap: 8 }}>
         <button type="submit">Sök</button>
+        <button type="button" onClick={handleDemo}>Testa Pikachu</button>
       </div>
     </form>
   )
