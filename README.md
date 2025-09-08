@@ -4,6 +4,8 @@ En liten, responsiv React-app där jag kan söka efter Pokémon (via namn eller 
 
 ## Kom igång
 
+cd pokemon-app
+
 npm install
 
 npm run dev
