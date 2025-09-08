@@ -1,11 +1,17 @@
-import { describe, it, expect, vi } from 'vitest'
-import { render, screen, waitFor } from '@testing-library/react'
+/* @vitest-environment jsdom */
+
+import { describe, it, expect, vi, afterEach } from 'vitest'
+import { render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import App from '../App.jsx'
 
+afterEach(() => {
+  vi.restoreAllMocks()
+})
+
 describe('App integration', () => {
   it('searches and shows a Pokemon card', async () => {
-    // Mocka fetch
+    // ✅ Mock för lyckad träff
     global.fetch = vi.fn().mockResolvedValueOnce({
       ok: true,
       json: async () => ({
@@ -14,14 +20,17 @@ describe('App integration', () => {
         height: 4,
         weight: 60,
         sprites: { front_default: 'https://img.example/pikachu.png' },
-        types: [{ type: { name: 'electric' } }]
-      })
+        types: [{ type: { name: 'electric' } }],
+      }),
     })
 
     render(<App />)
+    const user = userEvent.setup()
+
     const input = screen.getByLabelText(/sök pokémon/i)
-    await userEvent.type(input, 'Pikachu')
-    await userEvent.click(screen.getByRole('button', { name: /sök/i }))
+    const form = input.closest('form')
+    await user.type(input, 'Pikachu')
+    await user.click(within(form).getByRole('button', { name: /sök/i }))
 
     await waitFor(() => {
       expect(screen.getByRole('heading', { name: /pikachu/i })).toBeInTheDocument()
@@ -29,11 +38,21 @@ describe('App integration', () => {
   })
 
   it('shows error when not found', async () => {
-    global.fetch = vi.fn().mockResolvedValueOnce({ ok: false, status: 404 })
+    // ✅ Mock för 404 (inklusive text() eftersom hooken läser res.text())
+    global.fetch = vi.fn().mockResolvedValueOnce({
+      ok: false,
+      status: 404,
+      text: async () => '',
+    })
+
     render(<App />)
-    await userEvent.type(screen.getByLabelText(/sök pokémon/i), 'nope')
-    await userEvent.click(screen.getByRole('button', { name: /sök/i }))
-    await screen.findByRole('alert')
-    expect(screen.getByRole('alert').textContent).toMatch(/hittades inte/i)
+    const user = userEvent.setup()
+
+    const input = screen.getByLabelText(/sök pokémon/i)
+    const form = input.closest('form')
+    await user.type(input, 'nope')
+    await user.click(within(form).getByRole('button', { name: /sök/i }))
+
+    expect(await screen.findByRole('alert')).toHaveTextContent(/hittades inte/i)
   })
 })
