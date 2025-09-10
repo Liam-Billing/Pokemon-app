@@ -18,7 +18,7 @@ export default function App() {
   return (
     <div className="container">
       <header>
-        <h1>Pokémon-sök</h1>
+        <h1>Pokémon-app</h1>
       </header>
 
       <div className="card">
