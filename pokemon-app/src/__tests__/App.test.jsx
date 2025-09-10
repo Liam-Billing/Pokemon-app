@@ -11,7 +11,7 @@ afterEach(() => {
 
 describe('App integration', () => {
   it('searches and shows a Pokemon card', async () => {
-    // ✅ Mock för lyckad träff
+   
     global.fetch = vi.fn().mockResolvedValueOnce({
       ok: true,
       json: async () => ({
@@ -38,7 +38,7 @@ describe('App integration', () => {
   })
 
   it('shows error when not found', async () => {
-    // ✅ Mock för 404 (inklusive text() eftersom hooken läser res.text())
+    
     global.fetch = vi.fn().mockResolvedValueOnce({
       ok: false,
       status: 404,
