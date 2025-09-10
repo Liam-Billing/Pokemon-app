@@ -38,4 +38,4 @@ Felhantering: 404 visar “Pokémon hittades inte.”, andra fel visar ett gener
 ## Val
 
 Jag valde React + Vite för att komma igång snabbt. En egen hook gjorde det tydligt att separera dataloggik från UI. Jag prioriterade enkel och responsiv layout, tydliga felmeddelanden och grundläggande validering. Testerna täcker inputsanering och huvudflödet (sök + 404).
-Med mer tid hade jag lagt till favoriter (LocalStorage), fler tester (t.ex. med MSW) och lite mer visuellt polish per Pokémon-typ.
+Med mer tid hade jag lagt till lite mer visuellt polish per Pokémon-typ.
